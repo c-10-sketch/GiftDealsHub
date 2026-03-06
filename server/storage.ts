@@ -3,7 +3,7 @@ import {
   users, giftCards, sellRequests, payoutDetails, kycDocuments, banners, supportTickets,
   type User, type GiftCard, type SellRequest, type PayoutDetails, type KycDocument, type Banner, type SupportTicket,
   type LoginRequest
-} from "@shared/schema";
+} from "../shared/schema";
 import { eq } from "drizzle-orm";
 import { type InferInsertModel } from "drizzle-orm";
 
