@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { 
   User, GiftCard, SellRequest, PayoutDetails, KycDocument, Banner, SupportTicket,
   LoginRequest
-} from '@shared/schema';
+} from '../shared/schema';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
