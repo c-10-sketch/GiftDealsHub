@@ -14,7 +14,7 @@ export interface IMongoStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: any): Promise<User>;
   updateUserKycStatus(id: number, status: boolean): Promise<User>;
-  updateUserKycStatusByEmail(userId: number, status: boolean): Promise<User>;
+  updateUserKycStatusByUserId(userId: number, status: boolean): Promise<User>;
   
   getGiftCards(): Promise<GiftCard[]>;
   createGiftCard(card: any): Promise<GiftCard>;
@@ -144,7 +144,8 @@ export class MongoStorage implements IMongoStorage {
     if (!result) {
       throw new Error('User not found');
     }
-    
+
+    return result as unknown as User;
   }
 
   async updateUserKycStatusByUserId(userId: number, status: boolean): Promise<User> {
@@ -253,10 +254,12 @@ export class MongoStorage implements IMongoStorage {
     }
     
     const updated = await db.collection('giftcards').findOne(query);
-    return updated ? {
-      ...updated,
-      id: updated._id || updated.id
-    } as GiftCard : null;
+    return updated
+      ? ({
+          ...updated,
+          id: (updated as any).id ?? String(updated._id)
+        } as unknown as GiftCard)
+      : null;
   }
 
   async deleteGiftCard(id: string): Promise<boolean> {
@@ -293,20 +296,6 @@ export class MongoStorage implements IMongoStorage {
     }));
   }
 
-  async createBanner(insertBanner: any): Promise<any> {
-    const db = await getMongoDB();
-    const id = await this.getNextSequence('banners');
-    
-    const banner = {
-      ...insertBanner,
-      id,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    await db.collection('banners').insertOne(banner);
-    return banner;
-  }
 
   async updateBanner(id: string, updateData: any): Promise<any | null> {
     const db = await getMongoDB();
@@ -410,7 +399,7 @@ export class MongoStorage implements IMongoStorage {
       throw new Error('Sell request not found');
     }
     
-    return result as SellRequest;
+    return result as unknown as SellRequest;
   }
 
   async updateSellRequestStatusByMongoId(mongoId: string, status: string, rejectionNote?: string): Promise<SellRequest> {
@@ -445,7 +434,11 @@ export class MongoStorage implements IMongoStorage {
     
     // Return the updated document
     const updatedDoc = await db.collection('sellrequests').findOne({ _id: new ObjectId(mongoId) });
-    return updatedDoc as SellRequest;
+    if (!updatedDoc) {
+      throw new Error('Sell request not found after update');
+    }
+
+    return updatedDoc as unknown as SellRequest;
   }
 
   async getPayoutDetails(userId: number): Promise<PayoutDetails | undefined> {
@@ -535,7 +528,7 @@ export class MongoStorage implements IMongoStorage {
       throw new Error('KYC document not found');
     }
     
-    return result as KycDocument;
+    return result as unknown as KycDocument;
   }
 
   async updateKycDocumentStatusByMongoId(mongoId: string, status: string): Promise<KycDocument> {
