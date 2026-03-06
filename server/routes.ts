@@ -1,4 +1,4 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import type { Express } from "express";
 import type { Server } from "http";
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
@@ -10,7 +10,7 @@ import { api } from "@shared/routes";
 import { getNextSequence } from "./utils/counter";
 import { getMongoDB } from "./mongodb";
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import { requireAuth, requireAdmin, AuthRequest } from './auth';
+import { requireAuth, requireAdmin, type AuthRequest } from './auth';
 
 // Cloudinary Configuration
 cloudinary.config({ 
@@ -36,36 +36,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
-
 const JWT_SECRET = process.env.JWT_SECRET || "your-super-secret-jwt-key-change-in-prod";
-
-
-interface AuthRequest extends Request {
-  user?: { id: number; role: string };
-}
-
-const requireAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; role: string };
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
-  }
-};
-
-const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user?.role !== "SUPER_ADMIN") {
-    return res.status(403).json({ message: "Forbidden: Super Admin required" });
-  }
-  next();
-};
 
 async function seedDatabase(storage: any) {
   const usersList = await storage.getAllUsers();
@@ -131,7 +102,7 @@ export async function registerRoutes(
       
       
       const db = await getMongoDB();
-      let nextId: number;
+      let nextId: number | undefined;
       let retries = 0;
       const maxRetries = 3;
       
@@ -159,7 +130,7 @@ export async function registerRoutes(
       
       // Safety fallback: if we still can't get unique ID, mark as KYC verified
       let kycVerified = false;
-      if (retries >= maxRetries) {
+      if (retries >= maxRetries || nextId === undefined) {
         console.log("⚠️  Could not generate unique ID, marking user as KYC verified as fallback");
         kycVerified = true;
         // As last resort, use a random high number
@@ -227,10 +198,13 @@ export async function registerRoutes(
   app.get(api.giftCards.list.path, async (req, res) => {
     const cards = await storage.getGiftCards();
     // Map _id to id for frontend compatibility
-    const mappedCards = cards.map(card => ({
-      ...card,
-      id: card._id || card.id
-    }));
+    const mappedCards = cards.map(card => {
+      const mongoCard = card as { _id?: string | number };
+      return {
+        ...card,
+        id: mongoCard._id || card.id,
+      };
+    });
     res.status(200).json(mappedCards);
   });
 

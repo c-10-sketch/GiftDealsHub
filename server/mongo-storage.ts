@@ -63,11 +63,11 @@ export class MongoStorage implements IMongoStorage {
       console.log('MongoDB sequence result:', result);
       console.log('Current counters after:', this.counters);
       
-      if (result.value && result.value.seq) {
-        console.log(`Generated sequence: ${result.value.seq}`);
-        return result.value.seq;
+      if (result && typeof result.seq === 'number') {
+        console.log(`Generated sequence: ${result.seq}`);
+        return result.seq;
       } else {
-        console.log('No result.value, using fallback');
+        console.log('No sequence result, using fallback');
         // Fallback to in-memory counter if MongoDB fails
         if (!this.counters[sequenceName]) {
           this.counters[sequenceName] = 1;
@@ -140,11 +140,11 @@ export class MongoStorage implements IMongoStorage {
       { returnDocument: 'after' }
     );
     
-    if (!result.value) {
+    if (!result) {
       throw new Error('User not found');
     }
     
-    return result.value as User;
+    return result as User;
   }
 
   async updateUserKycStatusByUserId(userId: number, status: boolean): Promise<User> {
@@ -406,11 +406,11 @@ export class MongoStorage implements IMongoStorage {
       { returnDocument: 'after' }
     );
     
-    if (!result.value) {
+    if (!result) {
       throw new Error('Sell request not found');
     }
     
-    return result.value as SellRequest;
+    return result as SellRequest;
   }
 
   async updateSellRequestStatusByMongoId(mongoId: string, status: string, rejectionNote?: string): Promise<SellRequest> {
@@ -529,13 +529,13 @@ export class MongoStorage implements IMongoStorage {
       { returnDocument: 'after' }
     );
     
-    console.log("MongoDB update result:", { result: result.value });
+    console.log("MongoDB update result:", { result });
     
-    if (!result.value) {
+    if (!result) {
       throw new Error('KYC document not found');
     }
     
-    return result.value as KycDocument;
+    return result as KycDocument;
   }
 
   async updateKycDocumentStatusByMongoId(mongoId: string, status: string): Promise<KycDocument> {
