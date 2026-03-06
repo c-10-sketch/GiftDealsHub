@@ -11,7 +11,7 @@ let client: MongoClient;
 let db: Db;
 
 export async function connectToMongoDB(): Promise<Db> {
-  if (client && client.isConnected()) {
+  if (client && db) {
     return db;
   }
 
