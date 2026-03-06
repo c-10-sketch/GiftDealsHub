@@ -1,4 +1,4 @@
-import { getMongoDB } from './mongodb';
+import { getMongoDB } from './mongodb.js';
 import bcrypt from 'bcryptjs';
 import { ObjectId } from 'mongodb';
 import { 

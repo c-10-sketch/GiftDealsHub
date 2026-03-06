@@ -8,7 +8,7 @@ import multer from 'multer';
 import { mongoStorage } from "./mongo-storage.js";
 import { api } from "@shared/routes";
 import { getNextSequence } from "./utils/counter";
-import { getMongoDB } from "./mongodb";
+import { getMongoDB } from "./mongodb.js";
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { requireAuth, requireAdmin, type AuthRequest } from './auth';
 

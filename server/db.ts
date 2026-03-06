@@ -21,7 +21,7 @@ export { pool, db };
 export let mongoDB: any = null;
 
 export async function initializeMongoDB() {
-  const { connectToMongoDB } = await import("./mongodb");
+  const { connectToMongoDB } = await import("./mongodb.js");
   mongoDB = await connectToMongoDB();
   return mongoDB;
 }
