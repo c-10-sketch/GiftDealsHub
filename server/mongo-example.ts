@@ -1,4 +1,4 @@
-import { getMongoDB } from './mongodb';
+import { getMongoDB } from './mongodb.js';
 
 // Example usage of MongoDB in your application
 export async function createGiftCard(data: {
