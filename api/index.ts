@@ -7,13 +7,16 @@ import { existsSync } from "fs";
 // For Vercel: files are copied to api/server during build
 // For local: uses parent directory
 const getRegisterRoutes = async () => {
+  const vercelRoutesPath = "./server/routes.js";
+  const localRoutesPath = "../server/routes.js";
+
   try {
     // Try api/server first (for Vercel after build copies files)
-    const routesModule = await import("./server/routes.js");
+    const routesModule = await import(vercelRoutesPath);
     return routesModule.registerRoutes;
   } catch {
     // Fallback to parent directory (for local dev)
-    const routesModule = await import("../server/routes.js");
+    const routesModule = await import(localRoutesPath);
     return routesModule.registerRoutes;
   }
 };

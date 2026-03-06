@@ -79,9 +79,10 @@ export class MongoStorage implements IMongoStorage {
       }
     } catch (err) {
       console.error('Sequence generation error:', err);
+      const error = err instanceof Error ? err : new Error(String(err));
       console.error('Error details:', {
-        message: err.message,
-        stack: err.stack
+        message: error.message,
+        stack: error.stack
       });
       
       // Fallback to in-memory counter if MongoDB fails
@@ -144,7 +145,6 @@ export class MongoStorage implements IMongoStorage {
       throw new Error('User not found');
     }
     
-    return result as User;
   }
 
   async updateUserKycStatusByUserId(userId: number, status: boolean): Promise<User> {
