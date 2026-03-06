@@ -145,11 +145,6 @@ export class MongoStorage implements IMongoStorage {
       throw new Error('User not found');
     }
     
-    return result as unknown as User;
-  }
-
-  async updateUserKycStatusByEmail(userId: number, status: boolean): Promise<User> {
-    return this.updateUserKycStatusByUserId(userId, status);
   }
 
   async updateUserKycStatusByUserId(userId: number, status: boolean): Promise<User> {

@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
-import { mongoStorage } from "./mongo-storage";
+import { mongoStorage } from "./mongo-storage.js";
 import { api } from "@shared/routes";
 import { getNextSequence } from "./utils/counter";
 import { getMongoDB } from "./mongodb";
